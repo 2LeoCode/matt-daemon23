@@ -4,3 +4,4 @@
 -pedantic
 -std=c++23
 -stdlib=libc++
+-Iinc

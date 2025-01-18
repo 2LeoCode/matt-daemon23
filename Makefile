@@ -5,17 +5,18 @@ BUILD_DIR = .build
 BUILD_TYPE ?= debug
 
 SRC_DIR = src
+INC_DIR = inc
 OBJ_DIR = $(BUILD_DIR)/obj
 DEP_DIR = $(BUILD_DIR)/dep
 
-SRC = $(shell find $(SRC_DIR) -type f -name *.cpp)
+SRC = $(shell find $(SRC_DIR) -type f -name '*.cpp')
 OBJ = $(SRC:$(SRC_DIR)/%.cpp=$(OBJ_DIR)/%.o)
 DEP = $(OBJ:$(OBJ_DIR)/%.o=$(DEP_DIR)/%.d)
 
 CXX = clang++
 
-CXXFLAGS_REQUIRED = -Wall -Werror -Wextra -pedantic -std=c++23 -stdlib=libc++
-CXXFLAGS_DEBUG = $(CXXFLAGS_REQUIRED) -g3 -fsanitize=address
+CXXFLAGS_REQUIRED = -Wall -Werror -Wextra -pedantic -std=c++23 -stdlib=libc++ -I$(INC_DIR)
+CXXFLAGS_DEBUG = $(CXXFLAGS_REQUIRED) -g3 -fsanitize=address -DDEVELOPMENT
 CXXFLAGS_PRODUCTION = $(CXXFLAGS_REQUIRED) -O3 -DNDEBUG
 
 ifeq ($(BUILD_TYPE), debug)
@@ -32,7 +33,7 @@ all: $(NAME)
 
 -include $(DEP)
 
-$(NAME): $(MOD) $(OBJ)
+$(NAME): $(OBJ)
 	$(CXX) $(CXXFLAGS) $^ -o $@ $(LDFLAGS)
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
@@ -47,7 +48,7 @@ fclean: clean
 
 re: fclean all
 
-compile_flags.txt:
+compile_flags:
 	echo $(CXXFLAGS_REQUIRED) | tr ' ' '\n' > compile_flags.txt
 
-.PHONY: all clean fclean re
+.PHONY: all clean fclean compile_flags re
