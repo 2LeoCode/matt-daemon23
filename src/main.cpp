@@ -1,10 +1,11 @@
+#include <cstring>
 #include <unistd.h>
 
 #include <exception>
 #include <filesystem>
 #include <print>
 
-#include <errors.hpp>
+#include <core.hpp>
 #include <globals.hpp>
 #include <logging.hpp>
 
@@ -14,24 +15,36 @@ void start() {
   auto logger = logging::FileLogger("matt-daemon", fs::path(logDirectory));
 
 #ifndef DEVELOPMENT
-  if (geteuid() != 0) {
-    throw PermissionError();
+  if (geteuid() != 0)
+    throw core::PermissionError();
+
+  auto cpid = fork();
+
+  if (cpid == -1)
+    throw core::StartupError(std::strerror(errno));
+
+  if (cpid) {
+
+    return;
   }
 #endif
 
-  std::println("Hello world!");
+  logger.info("started successfully");
 }
 
 int main() {
   try {
     start();
-  } catch (const PermissionError &e) {
-    std::println(stderr, "Error: program must be run as root");
-  } catch (const logging::FatalError &) {
+  } catch (const core::Error &e) {
+    std::println(stderr, "Error: {}\n", e.what());
+    return 1;
+  } catch (const logging::Error &e) {
+    std::println(stderr, "Error: {}\n", e.what());
     return 1;
   } catch (const std::exception &e) {
     std::println(stderr, "Uncaught error: {}", e.what());
     return 1;
   }
+
   return 0;
 }

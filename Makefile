@@ -1,21 +1,19 @@
 NAME = matt-daemon
 
-BUILD_DIR = .build
 
 BUILD_TYPE ?= debug
 
 SRC_DIR = src
 INC_DIR = inc
-OBJ_DIR = $(BUILD_DIR)/obj
-DEP_DIR = $(BUILD_DIR)/dep
+OBJ_DIR = .obj
 
 SRC = $(shell find $(SRC_DIR) -type f -name '*.cpp')
 OBJ = $(SRC:$(SRC_DIR)/%.cpp=$(OBJ_DIR)/%.o)
-DEP = $(OBJ:$(OBJ_DIR)/%.o=$(DEP_DIR)/%.d)
+DEP = $(OBJ:.o=.d)
 
-CXX = clang++
+CXX = clang++-18
 
-CXXFLAGS_REQUIRED = -Wall -Werror -Wextra -pedantic -std=c++23 -stdlib=libc++ -I$(INC_DIR)
+CXXFLAGS_REQUIRED = -Wall -Werror -Wextra -pedantic -MMD -std=c++23 -stdlib=libc++ -I$(INC_DIR)
 CXXFLAGS_DEBUG = $(CXXFLAGS_REQUIRED) -g3 -fsanitize=address -DDEVELOPMENT
 CXXFLAGS_PRODUCTION = $(CXXFLAGS_REQUIRED) -O3 -DNDEBUG
 
@@ -41,7 +39,7 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 clean:
-	rm -rf $(BUILD_DIR)
+	rm -rf $(OBJ_DIR)
 
 fclean: clean
 	rm -rf $(NAME)

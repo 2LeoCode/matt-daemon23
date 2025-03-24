@@ -1,4 +1,4 @@
-#include <logging/logger.hpp>
+#include <logging/errors.hpp>
 
 namespace logging {
 

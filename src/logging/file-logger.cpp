@@ -20,7 +20,9 @@ FileLogger::FileLogger(const std::string_view &name, const fs::path &directory,
   auto file = directory / std::vformat(loc, "{:L%Om-%EY}_{}.log",
                                        std::make_format_args(now, name));
   fs::create_directories(directory);
-  this->m_stream = std::make_unique<std::ofstream>(file);
+  this->m_stream = std::make_unique<std::ofstream>(file, std::ios::app);
 }
+
+fs::path FileLogger::filePath() const { return this->m_filePath; }
 
 } // namespace logging

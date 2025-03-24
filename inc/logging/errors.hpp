@@ -5,7 +5,9 @@
 
 namespace logging {
 
-struct FatalError : public std::exception {
+struct Error : public std::exception {};
+
+struct FatalError : public Error {
   const char *what() const noexcept;
 };
 
